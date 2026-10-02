@@ -8,6 +8,19 @@ class io_dict_ini_test_case(io_dict_test_case):
     This class describes an IODict / ini test case.
     """
 
+    def test_from_ini_with_custom_default_section(self) -> None:
+        s = "[general]\nAttempts = 3\n[service]\nPort = 8080\n"
+        expected = {"Attempts": 3, "service": {"Attempts": 3, "Port": 8080}}
+        d = IODict.from_ini(s, default_section="general", sources=["data"])
+        self.assertEqual(d, expected)
+        self.assertEqual(IODict(s, format="ini", default_section="general"), expected)
+
+    def test_to_ini_with_custom_default_section(self) -> None:
+        d = IODict({"Attempts": 3, "service": {"Attempts": 3, "Port": 8080}})
+        s = d.to_ini(default_section="general")
+        self.assertTrue(s.startswith("[general]\n"))
+        self.assertEqual(IODict.from_ini(s, default_section="general"), d)
+
     def test_from_ini_with_valid_data(self) -> None:
         s = """
 [DEFAULT]
